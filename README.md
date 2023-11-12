@@ -1,6 +1,8 @@
 # texture
 A collection of utility functions for analyzing crystallographic texture maps. Curently just an implementation of the [Kernel Average Misorientation filter.](https://mtex-toolbox.github.io/EBSDKAM.html). To achive something like the below, please see the Kernel Average Misorientation Example section
 
+![image](https://github.com/AxelHenningsson/texture/assets/31615210/fa3a7dd2-7b94-437f-a1f5-01fda3f1977c)
+
 # Kernel Average Misorientation Example
 Given that `umap` is your `shape=(M,N,3,3)` orientation matrix numpy array map you may do something like this
 ````python
