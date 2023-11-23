@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from xfab.symmetry import Umis
+import xfab.symmetry
 from collections import deque
 from scipy.ndimage import binary_fill_holes
 from scipy.spatial.transform import Rotation
@@ -55,6 +56,19 @@ def flood_fill( orientation_map,
     segmentation[segmentation==0] = background_value
     return segmentation
 
+def _align( us, crystal_system ):
+    """Align a set of orientation matrices as closely as possible given a lattice symmetry.
+    """
+    rot = xfab.symmetry.rotations(crystal_system)
+    ref = us[0]
+    newu = np.zeros_like(us)
+    for i,u in enumerate(us):
+        mis = xfab.symmetry.Umis( u, ref, crystal_system )
+        rotindex = np.argmin(mis[:,1])
+        newu[i,:,:] =  u @ rot[rotindex]
+    return newu
+
+
 def _flood( orientation_map, 
             seed_point, 
             footprint, 
@@ -76,7 +90,8 @@ def _flood( orientation_map,
         U = orientation_map[i, j]
         
         if np.sum(flood_mask) < 20:
-            global_U = Rotation.from_matrix( orientation_map[flood_mask,:,:] ).mean().as_matrix()
+            us = _align( orientation_map[flood_mask,:,:], crystal_system )
+            global_U = Rotation.from_matrix( us ).mean().as_matrix()
 
         for k in range(footprint.shape[0]):
             for l in range(footprint.shape[1]):
